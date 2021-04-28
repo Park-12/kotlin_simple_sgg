@@ -1,3 +1,5 @@
+import java.lang.NullPointerException
+
 fun readLineTrim() = readLine()!!.trim()
 
 fun main() {
@@ -8,8 +10,8 @@ fun main() {
         val command = readLineTrim()
 
         val rq = Rq(command)
-        println(rq.getStringParam("title") == "제목1") // true
-        println(rq.getIntParam("id") == 1) // true
+        println(rq.getStringParam("title", "1") == "1") // true
+        //println(rq.getIntParam("id") == 1) // true
     }
 
     println("== SIMPLE SSG 끝 ==")
@@ -54,8 +56,27 @@ class Rq(command: String) {
         }
     }
 
-    fun getStringParam(name: String): String {
-        return paramMap[name]!!
+    fun getStringParam(name: String, default: String): String {
+        return paramMap[name] ?: default
+
+        /*
+        // v2
+        return if (paramMap[name] == null) {
+            default
+        } else {
+            paramMap[name]!!
+        }
+        */
+
+        /*
+        // v1
+        return try {
+            paramMap[name]!!
+        }
+        catch ( e: NullPointerException ) {
+            default
+        }
+        */
     }
 
     fun getIntParam(name: String): Int {
