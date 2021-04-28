@@ -1,4 +1,4 @@
-import java.lang.NullPointerException
+import java.lang.NumberFormatException
 
 fun readLineTrim() = readLine()!!.trim()
 
@@ -8,10 +8,11 @@ fun main() {
     while (true) {
         print("명령어) ")
         val command = readLineTrim()
+        // /article/detail
 
         val rq = Rq(command)
         println(rq.getStringParam("title", "1") == "1") // true
-        //println(rq.getIntParam("id") == 1) // true
+        println(rq.getIntParam("id", -1) == -1) // true
     }
 
     println("== SIMPLE SSG 끝 ==")
@@ -79,7 +80,15 @@ class Rq(command: String) {
         */
     }
 
-    fun getIntParam(name: String): Int {
-        return paramMap[name]!!.toInt()
+    fun getIntParam(name: String, default: Int): Int {
+        return if (paramMap[name] != null) {
+            try {
+                paramMap[name]!!.toInt()
+            } catch (e: NumberFormatException) {
+                default
+            }
+        } else {
+            default
+        }
     }
 }
