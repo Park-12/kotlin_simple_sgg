@@ -1,18 +1,34 @@
-import java.lang.NumberFormatException
-
-fun readLineTrim() = readLine()!!.trim()
+import java.text.SimpleDateFormat
 
 fun main() {
     println("== SIMPLE SSG 시작 ==")
 
+    articleRepository.makeTestArticles()
+
     while (true) {
         print("명령어) ")
         val command = readLineTrim()
-        // /article/detail
 
         val rq = Rq(command)
-        println(rq.getStringParam("title", "1") == "1") // true
-        println(rq.getIntParam("id", -1) == -1) // true
+
+        when (rq.actionPath) {
+            "/system/exit" -> {
+                println("프로그램을 종료합니다.")
+                break
+            }
+            "/article/detail" -> {
+                val id = rq.getIntParam("id", 0)
+
+                if (id == 0) {
+                    println("id를 입력해주세요.")
+                    continue
+                }
+
+                val article = articleRepository.articles[id - 1]
+
+                println(article)
+            }
+        }
     }
 
     println("== SIMPLE SSG 끝 ==")
@@ -20,7 +36,7 @@ fun main() {
 
 class Rq(command: String) {
     val actionPath: String
-    val paramMap: Map<String, String>
+    private val paramMap: Map<String, String>
 
     init {
         val commandBits = command.split("?", limit = 2)
@@ -59,25 +75,6 @@ class Rq(command: String) {
 
     fun getStringParam(name: String, default: String): String {
         return paramMap[name] ?: default
-
-        /*
-        // v2
-        return if (paramMap[name] == null) {
-            default
-        } else {
-            paramMap[name]!!
-        }
-        */
-
-        /*
-        // v1
-        return try {
-            paramMap[name]!!
-        }
-        catch ( e: NullPointerException ) {
-            default
-        }
-        */
     }
 
     fun getIntParam(name: String, default: Int): Int {
@@ -92,3 +89,43 @@ class Rq(command: String) {
         }
     }
 }
+
+// 게시물 관련 시작
+data class Article(
+    val id: Int,
+    val regDate: String,
+    val updateDate: String,
+    val title: String,
+    val body: String
+)
+
+object articleRepository {
+    val articles = mutableListOf<Article>()
+    var lastId = 0
+
+    fun addArticle(title: String, body: String) {
+        val id = ++lastId
+        val regDate = Util.getNowDateStr()
+        val updateDate = Util.getNowDateStr()
+        articles.add(Article(id, regDate, updateDate, title, body))
+    }
+
+    fun makeTestArticles() {
+        for (id in 1..100) {
+            addArticle("제목_$id", "내용_$id")
+        }
+    }
+}
+// 게시물 관련 끝
+
+// 유틸 관련 시작
+fun readLineTrim() = readLine()!!.trim()
+
+object Util {
+    fun getNowDateStr(): String {
+        val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+
+        return format.format(System.currentTimeMillis())
+    }
+}
+// 유틸 관련 끝
