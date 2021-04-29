@@ -18,7 +18,8 @@ fun main() {
             }
             "/article/list" -> {
                 println("번호 / 작성날짜 / 갱신날짜 / 제목 / 내용")
-                for(article in articleRepository.getArticles().reversed()) {
+
+                for (article in articleRepository.getArticles().reversed()) {
                     println("${article.id} / ${article.regDate} / ${article.updateDate} / ${article.title} / ${article.body}")
                 }
             }
@@ -31,16 +32,41 @@ fun main() {
                 }
 
                 val article = articleRepository.getArticleById(id)
-                if(article == null) {
+
+                if (article == null) {
                     println("${id}번 게시물은 존재하지 않습니다.")
                     continue
                 }
 
                 println("번호 : ${article.id}")
-                println("작성 날짜 : ${article.regDate}")
-                println("갱신 날짜 : ${article.updateDate}")
+                println("작성날짜 : ${article.regDate}")
+                println("갱신날짜 : ${article.updateDate}")
                 println("제목 : ${article.title}")
                 println("내용 : ${article.body}")
+            }
+            "/article/modify" -> {
+                val id = rq.getIntParam("id", 0)
+
+                if (id == 0) {
+                    println("id를 입력해주세요.")
+                    continue
+                }
+
+                val article = articleRepository.getArticleById(id)
+
+                if (article == null) {
+                    println("${id}번 게시물은 존재하지 않습니다.")
+                    continue
+                }
+
+                print("${id}번 게시물 새 제목 : ")
+                val title = readLineTrim()
+                print("${id}번 게시물 새 내용 : ")
+                val body = readLineTrim()
+
+                articleRepository.modifyArticle(id, title, body)
+
+                println("${id}번 게시물이 수정되었습니다.")
             }
             "/article/delete" -> {
                 val id = rq.getIntParam("id", 0)
@@ -49,12 +75,14 @@ fun main() {
                     println("id를 입력해주세요.")
                     continue
                 }
+
                 val article = articleRepository.getArticleById(id)
 
-                if(article == null) {
+                if (article == null) {
                     println("${id}번 게시물은 존재하지 않습니다.")
                     continue
                 }
+
                 articleRepository.deleteArticle(article)
             }
         }
@@ -138,9 +166,9 @@ class Rq(command: String) {
 data class Article(
     val id: Int,
     val regDate: String,
-    val updateDate: String,
-    val title: String,
-    val body: String
+    var updateDate: String,
+    var title: String,
+    var body: String
 )
 
 object articleRepository {
@@ -152,13 +180,13 @@ object articleRepository {
     }
 
     fun getArticleById(id: Int): Article? {
-        for(article in articles) {
-            if(article.id == id) {
+        for (article in articles) {
+            if (article.id == id) {
                 return article
             }
         }
-        return null
 
+        return null
     }
 
     fun addArticle(title: String, body: String) {
@@ -168,14 +196,22 @@ object articleRepository {
         articles.add(Article(id, regDate, updateDate, title, body))
     }
 
-    fun getArticles(): List<Article> {
-        return articles
-    }
-
     fun makeTestArticles() {
         for (id in 1..100) {
             addArticle("제목_$id", "내용_$id")
         }
+    }
+
+    fun getArticles(): List<Article> {
+        return articles
+    }
+
+    fun modifyArticle(id: Int, title: String, body: String) {
+        val article = getArticleById(id)!!
+
+        article.title = title
+        article.body = body
+        article.updateDate = Util.getNowDateStr()
     }
 }
 // 게시물 관련 끝
