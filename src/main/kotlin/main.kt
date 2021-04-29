@@ -17,9 +17,14 @@ fun main() {
                 break
             }
             "/article/list" -> {
+                val page = rq.getIntParam("page", 1)
+                val searchKeyword = rq.getStringParam("searchKeyword", "")
+
+                val filteredArticles = articleRepository.getFilteredArticles(searchKeyword)
+
                 println("번호 / 작성날짜 / 갱신날짜 / 제목 / 내용")
 
-                for (article in articleRepository.getArticles().reversed()) {
+                for (article in filteredArticles) {
                     println("${article.id} / ${article.regDate} / ${article.updateDate} / ${article.title} / ${article.body}")
                 }
             }
@@ -202,16 +207,24 @@ object articleRepository {
         }
     }
 
-    fun getArticles(): List<Article> {
-        return articles
-    }
-
     fun modifyArticle(id: Int, title: String, body: String) {
         val article = getArticleById(id)!!
 
         article.title = title
         article.body = body
         article.updateDate = Util.getNowDateStr()
+    }
+
+    fun getFilteredArticles(searchKeyword: String): List<Article> {
+        val filteredArticles = mutableListOf<Article>()
+
+        for (article in articles) {
+            if (article.title.contains(searchKeyword)) {
+                filteredArticles.add(article)
+            }
+        }
+
+        return filteredArticles
     }
 }
 // 게시물 관련 끝
