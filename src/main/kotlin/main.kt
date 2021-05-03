@@ -20,7 +20,7 @@ fun main() {
                 val page = rq.getIntParam("page", 1)
                 val searchKeyword = rq.getStringParam("searchKeyword", "")
 
-                val filteredArticles = articleRepository.getFilteredArticles(searchKeyword)
+                val filteredArticles = articleRepository.getFilteredArticles(searchKeyword, page, 10)
 
                 println("번호 / 작성날짜 / 갱신날짜 / 제목 / 내용")
 
@@ -215,13 +215,39 @@ object articleRepository {
         article.updateDate = Util.getNowDateStr()
     }
 
-    fun getFilteredArticles(searchKeyword: String): List<Article> {
+    fun getFilteredArticles(searchKeyword: String, page: Int, itemsCountInAPage: Int): List<Article> {
+        val filtered1Articles = getSearchKeywordFilteredArticles(articles, searchKeyword)
+        val filtered2Articles = getPageFilteredArticles(filtered1Articles, page, itemsCountInAPage)
+
+        return filtered2Articles
+    }
+
+    private fun getSearchKeywordFilteredArticles(articles: List<Article>, searchKeyword: String): List<Article> {
         val filteredArticles = mutableListOf<Article>()
 
         for (article in articles) {
             if (article.title.contains(searchKeyword)) {
                 filteredArticles.add(article)
             }
+        }
+
+        return filteredArticles
+    }
+
+    private fun getPageFilteredArticles(articles: List<Article>, page: Int, itemsCountInAPage: Int): List<Article> {
+        val filteredArticles = mutableListOf<Article>()
+
+        val offsetCount = (page - 1) * itemsCountInAPage
+
+        val startIndex = articles.lastIndex - offsetCount
+        var endIndex = startIndex - (itemsCountInAPage - 1)
+
+        if (endIndex < 0) {
+            endIndex = 0
+        }
+
+        for (i in startIndex downTo endIndex) {
+            filteredArticles.add(articles[i])
         }
 
         return filteredArticles
