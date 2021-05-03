@@ -16,6 +16,16 @@ fun main() {
                 println("프로그램을 종료합니다.")
                 break
             }
+            "/article/write" -> {
+                print("제목 : ")
+                val title = readLineTrim()
+                print("내용 : ")
+                val body = readLineTrim()
+
+                val id = articleRepository.addArticle(title, body)
+
+                println("${id}번 게시물이 추가되었습니다.")
+            }
             "/article/list" -> {
                 val page = rq.getIntParam("page", 1)
                 val searchKeyword = rq.getStringParam("searchKeyword", "")
@@ -194,11 +204,13 @@ object articleRepository {
         return null
     }
 
-    fun addArticle(title: String, body: String) {
+    fun addArticle(title: String, body: String): Int {
         val id = ++lastId
         val regDate = Util.getNowDateStr()
         val updateDate = Util.getNowDateStr()
         articles.add(Article(id, regDate, updateDate, title, body))
+
+        return id
     }
 
     fun makeTestArticles() {
