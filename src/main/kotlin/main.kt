@@ -12,7 +12,7 @@ fun main() {
         val prompt = if(loginedMember == null) {
             "명령어) "
         } else {
-           "${loginedMember.nickname}"
+           "${loginedMember.nickname}) "
         }
         print(prompt)
         val command = readLineTrim()
@@ -82,7 +82,7 @@ fun main() {
                 print("내용 : ")
                 val body = readLineTrim()
 
-                val id = articleRepository.addArticle(title, body)
+                val id = articleRepository.addArticle(loginedMember.id, title, body)
 
                 println("${id}번 게시물이 추가되었습니다.")
             }
@@ -288,6 +288,7 @@ data class Article(
     val id: Int,
     val regDate: String,
     var updateDate: String,
+    val memberid : Int,
     var title: String,
     var body: String
 )
@@ -310,18 +311,20 @@ object articleRepository {
         return null
     }
 
-    fun addArticle(title: String, body: String): Int {
+    fun addArticle(memberId: Int, title: String, body: String): Int {
         val id = ++lastId
         val regDate = Util.getNowDateStr()
         val updateDate = Util.getNowDateStr()
-        articles.add(Article(id, regDate, updateDate, title, body))
+
+        println(Article(id, regDate, updateDate, memberId,title, body))
+        articles.add(Article(id, regDate, updateDate, memberId,title, body))
 
         return id
     }
 
     fun makeTestArticles() {
         for (id in 1..100) {
-            addArticle("제목_$id", "내용_$id")
+            addArticle(id%9+1,"제목_$id", "내용_$id")
         }
     }
 
