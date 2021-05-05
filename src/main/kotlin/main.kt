@@ -9,10 +9,10 @@ fun main() {
     var loginedMember: Member? = null
 
     while (true) {
-        val prompt = if(loginedMember == null) {
+        val prompt = if (loginedMember == null) {
             "명령어) "
         } else {
-           "${loginedMember.nickname}) "
+            "${loginedMember.nickname}) "
         }
         print(prompt)
         val command = readLineTrim()
@@ -25,15 +25,17 @@ fun main() {
                 break
             }
             "/member/join" -> {
-                print("로그인 아이디 : ")
+                print("로그인아이디 : ")
                 val loginId = readLineTrim()
+
                 val isJoinableLoginId = memberRepository.isJoinableLoginId(loginId)
 
-                if(isJoinableLoginId == false) {
-                    println("'$loginId'은/는 이미 사용중인 로그인 아이디 입니다.")
+                if (isJoinableLoginId == false) {
+                    println("`$loginId`(은)는 이미 사용중인 로그인아이디 입니다.")
                     continue
                 }
-                print("로그인 비밀번호 : ")
+
+                print("로그인비밀번호 : ")
                 val loginPw = readLineTrim()
                 print("이름 : ")
                 val name = readLineTrim()
@@ -54,22 +56,26 @@ fun main() {
 
                 val member = memberRepository.getMemberByLoginId(loginId)
 
-                if(member == null) {
-                    println("'$loginId' 은/는 존재하지 않는 회원의 로그인 아이디입니다.")
+                if (member == null) {
+                    println("`$loginId`(은)는 존재하지 않는 회원의 로그인아이디 입니다.")
                     continue
                 }
-                print("로그인 비밀번호 : ")
+
+                print("로그인비밀번호 : ")
                 val loginPw = readLineTrim()
 
-                if(member.loginPw != loginPw) {
+                if (member.loginPw != loginPw) {
                     println("비밀번호가 일치하지 않습니다.")
                     continue
                 }
+
                 loginedMember = member
+
                 println("${member.nickname}님 환영합니다.")
             }
             "/member/logout" -> {
                 loginedMember = null
+
                 println("로그아웃 되었습니다.")
             }
             "/article/write" -> {
@@ -77,6 +83,7 @@ fun main() {
                     println("로그인 후 이용해주세요.")
                     continue
                 }
+
                 print("제목 : ")
                 val title = readLineTrim()
                 print("내용 : ")
@@ -95,7 +102,7 @@ fun main() {
                 println("번호 / 작성날짜 / 작성자 / 제목 / 내용")
 
                 for (article in filteredArticles) {
-                    val writer = memberRepository.getMemberById(article.memberid)!!
+                    val writer = memberRepository.getMemberById(article.memberId)!!
                     val writerName = writer.nickname
                     println("${article.id} / ${article.regDate} / ${writerName} / ${article.title} / ${article.body}")
                 }
@@ -141,6 +148,11 @@ fun main() {
                     continue
                 }
 
+                if (article.memberId != loginedMember.id) {
+                    println("권한이 없습니다.")
+                    continue
+                }
+
                 print("${id}번 게시물 새 제목 : ")
                 val title = readLineTrim()
                 print("${id}번 게시물 새 내용 : ")
@@ -167,6 +179,11 @@ fun main() {
 
                 if (article == null) {
                     println("${id}번 게시물은 존재하지 않습니다.")
+                    continue
+                }
+
+                if (article.memberId != loginedMember.id) {
+                    println("권한이 없습니다.")
                     continue
                 }
 
@@ -268,7 +285,7 @@ object memberRepository {
     private val members = mutableListOf<Member>()
     private var lastId = 0
 
-    fun join (loginId: String, loginPw: String, name: String, nickname: String, cellphone: String, email: String): Int {
+    fun join(loginId: String, loginPw: String, name: String, nickname: String, cellphone: String, email: String): Int {
         val id = ++lastId
         val regDate = Util.getNowDateStr()
         val updateDate = Util.getNowDateStr()
@@ -276,32 +293,39 @@ object memberRepository {
 
         return id
     }
-    fun isJoinableLoginId(loginId: String) : Boolean {
+
+    fun isJoinableLoginId(loginId: String): Boolean {
         val member = getMemberByLoginId(loginId)
 
         return member == null
-        }
+    }
+
     fun getMemberByLoginId(loginId: String): Member? {
-        for(member in members) {
-            if(member.loginId == loginId) {
+        for (member in members) {
+            if (member.loginId == loginId) {
                 return member
             }
         }
-        return  null
+
+        return null
     }
+
     fun makeTestMembers() {
-        for(id in 1..10) {
+        for (id in 1..9) {
             join("user${id}", "user${id}", "홍길동${id}", "사용자${id}", "0101234123${id}", "user${id}@test.com")
         }
     }
-    fun getMemberById(id: Int): Member?{
-        for(member in members) {
-            if(member.id == id) {
+
+    fun getMemberById(id: Int): Member? {
+        for (member in members) {
+            if (member.id == id) {
                 return member
             }
         }
-        return  null
+
+        return null
     }
+
 }
 // 회원 관련 끝
 
@@ -310,7 +334,7 @@ data class Article(
     val id: Int,
     val regDate: String,
     var updateDate: String,
-    val memberid : Int,
+    val memberId: Int,
     var title: String,
     var body: String
 )
@@ -338,15 +362,14 @@ object articleRepository {
         val regDate = Util.getNowDateStr()
         val updateDate = Util.getNowDateStr()
 
-        println(Article(id, regDate, updateDate, memberId,title, body))
-        articles.add(Article(id, regDate, updateDate, memberId,title, body))
+        articles.add(Article(id, regDate, updateDate, memberId, title, body))
 
         return id
     }
 
     fun makeTestArticles() {
-        for (id in 1..10) {
-            addArticle(id%9+1,"제목_$id", "내용_$id")
+        for (id in 1..20) {
+            addArticle(id % 9 + 1, "제목_$id", "내용_$id")
         }
     }
 
@@ -358,9 +381,9 @@ object articleRepository {
         article.updateDate = Util.getNowDateStr()
     }
 
-    fun getFilteredArticles(searchKeyword: String, page: Int, itemsCountInAPage: Int): List<Article> {
+    fun getFilteredArticles(searchKeyword: String, page: Int, takeCount: Int): List<Article> {
         val filtered1Articles = getSearchKeywordFilteredArticles(articles, searchKeyword)
-        val filtered2Articles = getPageFilteredArticles(filtered1Articles, page, itemsCountInAPage)
+        val filtered2Articles = getPageFilteredArticles(filtered1Articles, page, takeCount)
 
         return filtered2Articles
     }
