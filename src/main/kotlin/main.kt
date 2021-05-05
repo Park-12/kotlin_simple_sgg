@@ -16,6 +16,24 @@ fun main() {
                 println("프로그램을 종료합니다.")
                 break
             }
+            "member/join" -> {
+                print("로그인 아이디 : ")
+                val loginId = readLineTrim()
+                print("로그인 비밀번호 : ")
+                val loginPw = readLineTrim()
+                print("이름 : ")
+                val name = readLineTrim()
+                print("별명 : ")
+                val nickname = readLineTrim()
+                print("휴대전화번호 : ")
+                val cellphone = readLineTrim()
+                print("이메일 : ")
+                val email = readLineTrim()
+
+                val id = memberRepository.join(loginId, loginPw, name, nickname, cellphone, email)
+
+                println("${id}번 회원으로 가입되었습니다.")
+            }
             "/article/write" -> {
                 print("제목 : ")
                 val title = readLineTrim()
@@ -177,6 +195,33 @@ class Rq(command: String) {
     }
 }
 
+// 회원 관련 시작
+data class Member(
+    val id: Int,
+    val regDate: String,
+    var updateDate: String,
+    var loginId: String,
+    var loginPw: String,
+    var name: String,
+    var nickname: String,
+    var cellphone: String,
+    var email: String
+)
+
+object memberRepository {
+    private val members = mutableListOf<Member>()
+    private var lastId = 0
+    fun join (loginId: String, loginPw: String, name: String, nickname: String, cellphone: String, email: String): Int {
+        val id = ++lastId
+        val regDate = Util.getNowDateStr()
+        val updateDate = Util.getNowDateStr()
+        members.add(Member(id, regDate, updateDate, loginId, loginPw, name, nickname, cellphone, email))
+
+        return id
+    }
+}
+// 회원 관련 끝
+
 // 게시물 관련 시작
 data class Article(
     val id: Int,
@@ -246,13 +291,13 @@ object articleRepository {
         return filteredArticles
     }
 
-    private fun getPageFilteredArticles(articles: List<Article>, page: Int, itemsCountInAPage: Int): List<Article> {
+    private fun getPageFilteredArticles(articles: List<Article>, page: Int, takeCount: Int): List<Article> {
         val filteredArticles = mutableListOf<Article>()
 
-        val offsetCount = (page - 1) * itemsCountInAPage
+        val offsetCount = (page - 1) * takeCount
 
         val startIndex = articles.lastIndex - offsetCount
-        var endIndex = startIndex - (itemsCountInAPage - 1)
+        var endIndex = startIndex - (takeCount - 1)
 
         if (endIndex < 0) {
             endIndex = 0
