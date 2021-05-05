@@ -122,6 +122,11 @@ fun main() {
                 println("내용 : ${article.body}")
             }
             "/article/modify" -> {
+                if (loginedMember == null) {
+                    println("로그인 후 이용해주세요.")
+                    continue
+                }
+
                 val id = rq.getIntParam("id", 0)
 
                 if (id == 0) {
@@ -146,6 +151,11 @@ fun main() {
                 println("${id}번 게시물이 수정되었습니다.")
             }
             "/article/delete" -> {
+                if (loginedMember == null) {
+                    println("로그인 후 이용해주세요.")
+                    continue
+                }
+
                 val id = rq.getIntParam("id", 0)
 
                 if (id == 0) {
@@ -161,6 +171,8 @@ fun main() {
                 }
 
                 articleRepository.deleteArticle(article)
+
+                println("${id}번 게시물을 삭제하였습니다.")
             }
         }
     }
