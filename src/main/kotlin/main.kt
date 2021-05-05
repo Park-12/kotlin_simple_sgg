@@ -6,13 +6,13 @@ fun main() {
     memberRepository.makeTestMembers()
     articleRepository.makeTestArticles()
 
-    var isLogined = false
+    var loginedMember: Member? = null
 
     while (true) {
-        val prompt = if(isLogined) {
-            "로그인됨) "
-        } else {
+        val prompt = if(loginedMember == null) {
             "명령어) "
+        } else {
+           "${loginedMember.nickname}"
         }
         print(prompt)
         val command = readLineTrim()
@@ -65,14 +65,18 @@ fun main() {
                     println("비밀번호가 일치하지 않습니다.")
                     continue
                 }
-                isLogined = true
+                loginedMember = member
                 println("${member.nickname}님 환영합니다.")
             }
             "/member/logout" -> {
-                isLogined = false
+                loginedMember = null
                 println("로그아웃 되었습니다.")
             }
             "/article/write" -> {
+                if (loginedMember == null) {
+                    println("로그인 후 이용해주세요.")
+                    continue
+                }
                 print("제목 : ")
                 val title = readLineTrim()
                 print("내용 : ")
@@ -273,7 +277,7 @@ object memberRepository {
     }
     fun makeTestMembers() {
         for(id in 1..10) {
-            join("user${id}", "user${id}", "user${id}_이름", "user${id}_별명", "0101234123r${id}", "user${id}@test.com")
+            join("user${id}", "user${id}", "홍길동${id}", "사용자${id}", "0101234123${id}", "user${id}@test.com")
         }
     }
 }
