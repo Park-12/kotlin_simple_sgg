@@ -68,6 +68,10 @@ fun main() {
                 isLogined = true
                 println("${member.nickname}님 환영합니다.")
             }
+            "/member/logout" -> {
+                isLogined = false
+                println("로그아웃 되었습니다.")
+            }
             "/article/write" -> {
                 print("제목 : ")
                 val title = readLineTrim()
