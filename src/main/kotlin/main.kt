@@ -3,13 +3,11 @@ import java.text.SimpleDateFormat
 fun main() {
     println("== SIMPLE SSG 시작 ==")
 
-    val memberRepository = MemberRepository()
-    val articleRepository = ArticleRepository()
-
     memberRepository.makeTestMembers()
     articleRepository.makeTestArticles()
 
     val systemController = SystemController()
+    val boardController = BoardController()
     val articleController = ArticleController()
     val memberController = MemberController()
 
@@ -30,6 +28,9 @@ fun main() {
                 systemController.exit(rq)
 
                 break
+            }
+            "/board/list" -> {
+                boardController.list(rq)
             }
             "/member/logout" -> {
                 memberController.logout(rq)
@@ -145,6 +146,20 @@ class SystemController {
 }
 // 시스템 컨트롤러 끝
 
+// 게시판 컨트롤러 시작
+class BoardController {
+    fun list(rq: Rq) {
+        println("번호 / 생성날짜 / 이름 / 코드")
+
+        val boards = boardRepository.getFilteredBoards()
+
+        for(board in boards) {
+            println("${board.id} / ${board.regDate} / ${board.name} / ${board.code}")
+        }
+    }
+}
+// 게시판 컨트롤러 끝
+
 // 회원 컨트롤러 시작
 class MemberController {
     fun logout(rq: Rq) {
@@ -204,6 +219,7 @@ class MemberController {
         println("${id}번 회원으로 가입되었습니다.")
     }
 }
+val memberRepository = MemberRepository()
 
 // 회원 컨트롤러 끝
 
@@ -327,6 +343,9 @@ class ArticleController {
         }
     }
 }
+
+val articleRepository = ArticleRepository()
+
 // 게시물 컨트롤러 끝
 
 // 컨트롤러 끝
@@ -490,7 +509,28 @@ class ArticleRepository {
         return filteredArticles
     }
 }
+// 게시판 관련 시작
+data class Board(
+    val id: Int,
+    val regDate: String,
+    val updateDate: String,
+    val name: String,
+    val code: String
+)
 
+class BoardRepository {
+    val boards = mutableListOf(
+        Board(1, Util.getNowDateStr(), Util.getNowDateStr(), "공지", "notice"),
+        Board(2, Util.getNowDateStr(), Util.getNowDateStr(), "자유", "free")
+    )
+
+    fun getFilteredBoards(): List<Board> {
+        return boards
+    }
+}
+val boardRepository = BoardRepository()
+
+// 게시판 관련 끝
 // 유틸 관련 시작
 fun readLineTrim() = readLine()!!.trim()
 
