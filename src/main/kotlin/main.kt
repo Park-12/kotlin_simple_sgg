@@ -6,6 +6,9 @@ fun main() {
     memberRepository.makeTestMembers()
     articleRepository.makeTestArticles()
 
+    val systemController = SystemController()
+    val articleController = ArticleController()
+    val memberController = MemberController()
 
     while (true) {
         val prompt = if (loginedMember == null) {
@@ -131,7 +134,7 @@ var loginedMember: Member? = null
 
 // 컨트롤러 시작
 // 시스템 컨트롤러 시작
-object systemController{
+class SystemController{
     fun exit(rq: Rq) {
         println("프로그램을 종료합니다.")
     }
@@ -139,7 +142,7 @@ object systemController{
 // 시스템 컨트롤러 끝
 
 // 회원 컨트롤러 시작
-object memberController{
+class MemberController{
     fun join(rq: Rq) {
         print("로그인아이디 : ")
         val loginId = readLineTrim()
@@ -198,7 +201,7 @@ object memberController{
 // 회원 컨트롤러 끝
 
 // 게시물 컨트롤러 시작
-object articleController{
+class ArticleController{
     fun write(rq: Rq) {
         if (loginedMember == null) {
             println("로그인 후 이용해주세요.")
