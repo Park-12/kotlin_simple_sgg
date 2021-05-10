@@ -3,6 +3,9 @@ import java.text.SimpleDateFormat
 fun main() {
     println("== SIMPLE SSG 시작 ==")
 
+    val memberRepository = MemberRepository()
+    val articleRepository = ArticleRepository()
+
     memberRepository.makeTestMembers()
     articleRepository.makeTestArticles()
 
@@ -16,6 +19,7 @@ fun main() {
         } else {
             "${loginedMember!!.nickname}) "
         }
+
         print(prompt)
         val command = readLineTrim()
 
@@ -27,14 +31,14 @@ fun main() {
 
                 break
             }
-            "/member/join" -> {
-                memberController.join(rq)
+            "/member/logout" -> {
+                memberController.logout(rq)
             }
             "/member/login" -> {
                 memberController.login(rq)
             }
-            "/member/logout" -> {
-                memberController.logout(rq)
+            "/member/join" -> {
+                memberController.join(rq)
             }
             "/article/write" -> {
                 articleController.write(rq)
@@ -134,7 +138,7 @@ var loginedMember: Member? = null
 
 // 컨트롤러 시작
 // 시스템 컨트롤러 시작
-class SystemController{
+class SystemController {
     fun exit(rq: Rq) {
         println("프로그램을 종료합니다.")
     }
@@ -142,33 +146,13 @@ class SystemController{
 // 시스템 컨트롤러 끝
 
 // 회원 컨트롤러 시작
-class MemberController{
-    fun join(rq: Rq) {
-        print("로그인아이디 : ")
-        val loginId = readLineTrim()
+class MemberController {
+    fun logout(rq: Rq) {
+        loginedMember = null
 
-        val isJoinableLoginId = memberRepository.isJoinableLoginId(loginId)
-
-        if (isJoinableLoginId == false) {
-            println("`$loginId`(은)는 이미 사용중인 로그인아이디 입니다.")
-            return
-        }
-
-        print("로그인비밀번호 : ")
-        val loginPw = readLineTrim()
-        print("이름 : ")
-        val name = readLineTrim()
-        print("별명 : ")
-        val nickname = readLineTrim()
-        print("휴대전화번호 : ")
-        val cellphone = readLineTrim()
-        print("이메일 : ")
-        val email = readLineTrim()
-
-        val id = memberRepository.join(loginId, loginPw, name, nickname, cellphone, email)
-
-        println("${id}번 회원으로 가입되었습니다.")
+        println("로그아웃 되었습니다.")
     }
+
     fun login(rq: Rq) {
         print("로그인아이디 : ")
         val loginId = readLineTrim()
@@ -192,16 +176,39 @@ class MemberController{
 
         println("${member.nickname}님 환영합니다.")
     }
-    fun logout(rq: Rq) {
-        loginedMember = null
 
-        println("로그아웃 되었습니다.")
+    fun join(rq: Rq) {
+        print("로그인아이디 : ")
+        val loginId = readLineTrim()
+
+        val isJoinableLoginId = memberRepository.isJoinableLoginId(loginId)
+
+        if (isJoinableLoginId == false) {
+            println("`$loginId`(은)는 이미 사용중인 로그인아이디 입니다.")
+            return
+        }
+
+        print("로그인비밀번호 : ")
+        val loginPw = readLineTrim()
+        print("이름 : ")
+        val name = readLineTrim()
+        print("별명 : ")
+        val nickname = readLineTrim()
+        print("휴대전화번호 : ")
+        val cellphoneNo = readLineTrim()
+        print("이메일 : ")
+        val email = readLineTrim()
+
+        val id = memberRepository.join(loginId, loginPw, name, nickname, cellphoneNo, email)
+
+        println("${id}번 회원으로 가입되었습니다.")
     }
 }
+
 // 회원 컨트롤러 끝
 
 // 게시물 컨트롤러 시작
-class ArticleController{
+class ArticleController {
     fun write(rq: Rq) {
         if (loginedMember == null) {
             println("로그인 후 이용해주세요.")
@@ -217,70 +224,7 @@ class ArticleController{
 
         println("${id}번 게시물이 추가되었습니다.")
     }
-    fun list(rq: Rq) {
-        val page = rq.getIntParam("page", 1)
-        val searchKeyword = rq.getStringParam("searchKeyword", "")
 
-        val filteredArticles = articleRepository.getFilteredArticles(searchKeyword, page, 10)
-
-        println("번호 / 작성날짜 / 작성자 / 제목 / 내용")
-
-        for (article in filteredArticles) {
-            val writer = memberRepository.getMemberById(article.memberId)!!
-            val writerName = writer.nickname
-            println("${article.id} / ${article.regDate} / ${writerName} / ${article.title} / ${article.body}")
-        }
-    }
-    fun detail(rq: Rq) {
-        val id = rq.getIntParam("id", 0)
-
-        if (id == 0) {
-            println("id를 입력해주세요.")
-            return
-        }
-
-        val article = articleRepository.getArticleById(id)
-
-        if (article == null) {
-            println("${id}번 게시물은 존재하지 않습니다.")
-            return
-        }
-
-        println("번호 : ${article.id}")
-        println("작성날짜 : ${article.regDate}")
-        println("갱신날짜 : ${article.updateDate}")
-        println("제목 : ${article.title}")
-        println("내용 : ${article.body}")
-    }
-    fun delete(rq: Rq) {
-        if (loginedMember == null) {
-            println("로그인 후 이용해주세요.")
-            return
-        }
-
-        val id = rq.getIntParam("id", 0)
-
-        if (id == 0) {
-            println("id를 입력해주세요.")
-            return
-        }
-
-        val article = articleRepository.getArticleById(id)
-
-        if (article == null) {
-            println("${id}번 게시물은 존재하지 않습니다.")
-            return
-        }
-
-        if (article.memberId != loginedMember!!.id) {
-            println("권한이 없습니다.")
-            return
-        }
-
-        articleRepository.deleteArticle(article)
-
-        println("${id}번 게시물을 삭제하였습니다.")
-    }
     fun modify(rq: Rq) {
         if (loginedMember == null) {
             println("로그인 후 이용해주세요.")
@@ -315,10 +259,77 @@ class ArticleController{
 
         println("${id}번 게시물이 수정되었습니다.")
     }
+
+    fun delete(rq: Rq) {
+        if (loginedMember == null) {
+            println("로그인 후 이용해주세요.")
+            return
+        }
+
+        val id = rq.getIntParam("id", 0)
+
+        if (id == 0) {
+            println("id를 입력해주세요.")
+            return
+        }
+
+        val article = articleRepository.getArticleById(id)
+
+        if (article == null) {
+            println("${id}번 게시물은 존재하지 않습니다.")
+            return
+        }
+
+        if (article.memberId != loginedMember!!.id) {
+            println("권한이 없습니다.")
+            return
+        }
+
+        articleRepository.deleteArticle(article)
+
+        println("${id}번 게시물을 삭제하였습니다.")
+    }
+
+    fun detail(rq: Rq) {
+        val id = rq.getIntParam("id", 0)
+
+        if (id == 0) {
+            println("id를 입력해주세요.")
+            return
+        }
+
+        val article = articleRepository.getArticleById(id)
+
+        if (article == null) {
+            println("${id}번 게시물은 존재하지 않습니다.")
+            return
+        }
+
+        println("번호 : ${article.id}")
+        println("작성날짜 : ${article.regDate}")
+        println("갱신날짜 : ${article.updateDate}")
+        println("제목 : ${article.title}")
+        println("내용 : ${article.body}")
+    }
+
+    fun list(rq: Rq) {
+        val page = rq.getIntParam("page", 1)
+        val searchKeyword = rq.getStringParam("searchKeyword", "")
+
+        val filteredArticles = articleRepository.getFilteredArticles(searchKeyword, page, 10)
+
+        println("번호 / 작성날짜 / 작성자 / 제목 / 내용")
+
+        for (article in filteredArticles) {
+            val writer = memberRepository.getMemberById(article.memberId)!!
+            val writerName = writer.nickname
+            println("${article.id} / ${article.regDate} / ${writerName} / ${article.title}")
+        }
+    }
 }
 // 게시물 컨트롤러 끝
-// 컨트롤러 끝
 
+// 컨트롤러 끝
 
 // 회원 DTO
 data class Member(
@@ -329,20 +340,27 @@ data class Member(
     var loginPw: String,
     var name: String,
     var nickname: String,
-    var cellphone: String,
+    var cellphoneNo: String,
     var email: String
 )
 
 // 회원 리포지터리
-object memberRepository {
+class MemberRepository {
     private val members = mutableListOf<Member>()
     private var lastId = 0
 
-    fun join(loginId: String, loginPw: String, name: String, nickname: String, cellphone: String, email: String): Int {
+    fun join(
+        loginId: String,
+        loginPw: String,
+        name: String,
+        nickname: String,
+        cellphoneNo: String,
+        email: String
+    ): Int {
         val id = ++lastId
         val regDate = Util.getNowDateStr()
         val updateDate = Util.getNowDateStr()
-        members.add(Member(id, regDate, updateDate, loginId, loginPw, name, nickname, cellphone, email))
+        members.add(Member(id, regDate, updateDate, loginId, loginPw, name, nickname, cellphoneNo, email))
 
         return id
     }
@@ -381,7 +399,6 @@ object memberRepository {
 
 }
 
-
 // 게시물 DTO
 data class Article(
     val id: Int,
@@ -393,7 +410,7 @@ data class Article(
 )
 
 // 게시물 리포지터리
-object articleRepository {
+class ArticleRepository {
     private val articles = mutableListOf<Article>()
     private var lastId = 0
 
@@ -435,9 +452,9 @@ object articleRepository {
         article.updateDate = Util.getNowDateStr()
     }
 
-    fun getFilteredArticles(searchKeyword: String, page: Int, takeCount: Int): List<Article> {
+    fun getFilteredArticles(searchKeyword: String, page: Int, itemsCountInAPage: Int): List<Article> {
         val filtered1Articles = getSearchKeywordFilteredArticles(articles, searchKeyword)
-        val filtered2Articles = getPageFilteredArticles(filtered1Articles, page, takeCount)
+        val filtered2Articles = getPageFilteredArticles(filtered1Articles, page, itemsCountInAPage)
 
         return filtered2Articles
     }
@@ -454,13 +471,13 @@ object articleRepository {
         return filteredArticles
     }
 
-    private fun getPageFilteredArticles(articles: List<Article>, page: Int, takeCount: Int): List<Article> {
+    private fun getPageFilteredArticles(articles: List<Article>, page: Int, itemsCountInAPage: Int): List<Article> {
         val filteredArticles = mutableListOf<Article>()
 
-        val offsetCount = (page - 1) * takeCount
+        val offsetCount = (page - 1) * itemsCountInAPage
 
         val startIndex = articles.lastIndex - offsetCount
-        var endIndex = startIndex - (takeCount - 1)
+        var endIndex = startIndex - (itemsCountInAPage - 1)
 
         if (endIndex < 0) {
             endIndex = 0
@@ -473,7 +490,6 @@ object articleRepository {
         return filteredArticles
     }
 }
-
 
 // 유틸 관련 시작
 fun readLineTrim() = readLine()!!.trim()
