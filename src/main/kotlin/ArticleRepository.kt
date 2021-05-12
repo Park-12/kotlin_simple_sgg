@@ -40,18 +40,38 @@ class ArticleRepository {
         article.updateDate = Util.getNowDateStr()
     }
 
-    fun getFilteredArticles(searchKeyword: String, page: Int, itemsCountInAPage: Int): List<Article> {
-        val filtered1Articles = getSearchKeywordFilteredArticles(articles, searchKeyword)
+    fun getFilteredArticles(boardCode:String, searchKeyword: String, page: Int, itemsCountInAPage: Int): List<Article> {
+        val filtered1Articles = getSearchKeywordFilteredArticles(articles, boardCode, searchKeyword)
         val filtered2Articles = getPageFilteredArticles(filtered1Articles, page, itemsCountInAPage)
 
         return filtered2Articles
     }
 
-    private fun getSearchKeywordFilteredArticles(articles: List<Article>, searchKeyword: String): List<Article> {
+    private fun getSearchKeywordFilteredArticles(articles: List<Article>, boardCode: String, searchKeyword: String): List<Article> {
         val filteredArticles = mutableListOf<Article>()
 
+        val boardId = if(boardCode.isEmpty()) {
+            0
+        }else {
+            boardRepository.getBoardByCode(boardCode)!!.id
+        }
+
         for (article in articles) {
-            if (article.title.contains(searchKeyword)) {
+            var needToAdd = true
+
+            if ( boardId != 0 ) {
+                if ( article.boardId != boardId ) {
+                    needToAdd = false
+                }
+            }
+
+            if ( needToAdd && searchKeyword.isNotEmpty() ) {
+                if(!article.title.contains(searchKeyword)) {
+                    needToAdd = false
+                }
+            }
+
+            if(needToAdd) {
                 filteredArticles.add(article)
             }
         }

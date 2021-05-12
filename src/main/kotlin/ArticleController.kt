@@ -121,8 +121,9 @@ class ArticleController {
     fun list(rq: Rq) {
         val page = rq.getIntParam("page", 1)
         val searchKeyword = rq.getStringParam("searchKeyword", "")
+        val boardCode = rq.getStringParam("boardCode", "")
 
-        val filteredArticles = articleRepository.getFilteredArticles(searchKeyword, page, 10)
+        val filteredArticles = articleRepository.getFilteredArticles(boardCode, searchKeyword, page, 10)
 
         println("번호 / 작성날짜 / 게시물종류 / 작성자 / 제목 / 내용")
 
