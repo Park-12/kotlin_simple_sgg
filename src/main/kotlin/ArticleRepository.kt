@@ -16,19 +16,19 @@ class ArticleRepository {
         return null
     }
 
-    fun addArticle(memberId: Int, title: String, body: String): Int {
+    fun addArticle(boardId: Int, memberId: Int, title: String, body: String): Int {
         val id = ++lastId
         val regDate = Util.getNowDateStr()
         val updateDate = Util.getNowDateStr()
 
-        articles.add(Article(id, regDate, updateDate, memberId, title, body))
+        articles.add(Article(id, regDate, updateDate, boardId, memberId, title, body))
 
         return id
     }
 
     fun makeTestArticles() {
         for (id in 1..20) {
-            addArticle(id % 9 + 1, "제목_$id", "내용_$id")
+            addArticle(id % 2 + 1, id % 9 + 1, "제목_$id", "내용_$id")
         }
     }
 

@@ -1,11 +1,13 @@
 class BoardRepository {
     private val boards = mutableListOf<Board>()
+
     private var lastId = 0
 
-    fun makeTestBoard() {
-        addBoard("공지", "notice")
-        addBoard("자유", "free")
+    fun makeTestBoards() {
+        makeBoard("공지", "notice")
+        makeBoard("자유", "free")
     }
+
     fun getFilteredBoards(): List<Board> {
         return boards
     }
@@ -16,6 +18,7 @@ class BoardRepository {
                 return board
             }
         }
+
         return null
     }
 
@@ -25,16 +28,27 @@ class BoardRepository {
                 return board
             }
         }
+
         return null
     }
 
-    fun addBoard(name: String, code: String): Int {
-        val id = ++ lastId
+    fun makeBoard(name: String, code: String): Int {
+        val id = ++lastId
         val regDate = Util.getNowDateStr()
         val updateDate = Util.getNowDateStr()
 
         boards.add(Board(id, regDate, updateDate, name, code))
 
         return id
+    }
+
+    fun getBoardById(id: Int): Board? {
+        for (board in boards) {
+            if (board.id == id) {
+                return board
+            }
+        }
+
+        return null
     }
 }

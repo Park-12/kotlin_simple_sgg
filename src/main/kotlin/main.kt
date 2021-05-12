@@ -3,12 +3,13 @@ import java.text.SimpleDateFormat
 fun main() {
     println("== SIMPLE SSG 시작 ==")
 
-    boardRepository.makeTestBoard()
+    boardRepository.makeTestBoards()
     memberRepository.makeTestMembers()
     articleRepository.makeTestArticles()
 
     val systemController = SystemController()
     val boardController = BoardController()
+
     val articleController = ArticleController()
     val memberController = MemberController()
 
