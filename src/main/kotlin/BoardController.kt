@@ -9,7 +9,7 @@ class BoardController {
         }
     }
 
-    fun add(rq: Rq) {
+    fun make(rq: Rq) {
         print("게시판 이름 : ")
          val name = readLineTrim()
 

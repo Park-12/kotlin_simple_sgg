@@ -1,5 +1,3 @@
-import java.text.SimpleDateFormat
-
 fun main() {
     println("== SIMPLE SSG 시작 ==")
 
@@ -9,9 +7,11 @@ fun main() {
 
     val systemController = SystemController()
     val boardController = BoardController()
-
     val articleController = ArticleController()
     val memberController = MemberController()
+
+    // 1번 회원으로 로그인된 상태로 시작
+    loginedMember = memberRepository.getMemberById(1)
 
     while (true) {
         val prompt = if (loginedMember == null) {
@@ -34,8 +34,8 @@ fun main() {
             "/board/list" -> {
                 boardController.list(rq)
             }
-            "/board/add" -> {
-                boardController.add(rq)
+            "/board/make" -> {
+                boardController.make(rq)
             }
             "/member/logout" -> {
                 memberController.logout(rq)
