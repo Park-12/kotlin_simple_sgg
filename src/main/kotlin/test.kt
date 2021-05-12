@@ -5,7 +5,25 @@ fun main() {
     //testWriteFile2();
     //testWriteFile3();
     //testReadFile();
-    testReadFile2();
+    //testReadFile2();
+    testReadFile3()
+}
+
+fun wirteIntFile(filePath: String, fileContent: Int) {
+    writeStrFile(filePath, fileContent.toString())
+}
+
+fun readIntFromFile(filePath: String): Int {
+    return readStrFromFile(filePath).toInt()
+}
+
+fun readStrFromFile(filePath: String): String {
+    return File(filePath).readText(Charsets.UTF_8)
+}
+
+fun writeStrFile(filePath: String, fileContent: String) {
+    File(filePath).parentFile.mkdirs()
+    File(filePath).writeText(fileContent)
 }
 
 data class TestArticle(
@@ -37,6 +55,13 @@ data class TestArticle(
     }
 }
 
+fun testReadFile3() {
+    wirteIntFile("test/4.txt", 100)
+    val num = readIntFromFile("test/4.txt")
+
+    println("num : $num")
+}
+
 fun testReadFile2() {
     testWriteFile3();
 
@@ -48,7 +73,7 @@ fun testReadFile2() {
         "body":"내용1"
     }
     */
-    val fileContent = File("test/3.json").readText(Charsets.UTF_8)
+    val fileContent = readStrFromFile("test/3.json")
 
     val testArticle = testArticleFromJson(fileContent)
     println(testArticle.id) // 출력 : 1
@@ -103,13 +128,13 @@ fun mapFromJson(jsonStr: String): Map<String, Any> {
 fun testReadFile() {
     testWriteFile()
 
-    val fileContent = File("test/1.txt").readText(Charsets.UTF_8)
+    val fileContent = readStrFromFile("test/1.txt")
     println("test/1.txt의 내용 : $fileContent")
 }
 
 fun testWriteFile3() {
     val testArticle = TestArticle(8, "제목1", "내용1")
-    File("test/3.json").writeText(testArticle.toJson())
+    writeStrFile("test/3.json", testArticle.toJson())
 }
 
 fun testWriteFile2() {
@@ -128,9 +153,9 @@ fun testWriteFile2() {
     fileContent += "\r\n"
     fileContent += "}"
 
-    File("test/2.txt").writeText(fileContent)
+    writeStrFile("test/2.txt", fileContent)
 }
 
 fun testWriteFile() {
-    File("test/1.txt").writeText("안녕하세요.")
+    writeStrFile("test/1.txt", "안녕하세요.")
 }
