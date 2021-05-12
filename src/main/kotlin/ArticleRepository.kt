@@ -1,35 +1,42 @@
 class ArticleRepository {
-    private val articles = mutableListOf<Article>()
-    private var lastId = 0
+    fun getArticles(): List<Article> {
+        val lastId = getLastId()
+
+        for (id in 1..lastId) {
+            val jsonStr = readStrFromFile("data/article/$id.json")
+
+            println(jsonStr)
+        }
+
+        return mutableListOf<Article>()
+    }
+
+    fun getLastId(): Int {
+        val lastId = readIntFromFile("data/article/lastId.txt")
+
+        return lastId
+    }
 
     fun deleteArticle(article: Article) {
-        articles.remove(article)
+        // 파일 삭제
     }
 
     fun getArticleById(id: Int): Article? {
-        for (article in articles) {
-            if (article.id == id) {
-                return article
-            }
-        }
-
-        return null
+        // 파일에서 객체 얻기
+        return Article(1, "", "", 1, 1, "", "")
     }
 
     fun addArticle(boardId: Int, memberId: Int, title: String, body: String): Int {
-        val id = ++lastId
-        val regDate = Util.getNowDateStr()
-        val updateDate = Util.getNowDateStr()
-
-        articles.add(Article(id, regDate, updateDate, boardId, memberId, title, body))
-
-        return id
+        // 파일 생성
+        return 0
     }
 
     fun makeTestArticles() {
+        /*
         for (id in 1..20) {
             addArticle(id % 2 + 1, id % 9 + 1, "제목_$id", "내용_$id")
         }
+        */
     }
 
     fun modifyArticle(id: Int, title: String, body: String) {
@@ -38,6 +45,8 @@ class ArticleRepository {
         article.title = title
         article.body = body
         article.updateDate = Util.getNowDateStr()
+
+        // 파일 수정
     }
 
     fun getFilteredArticles(
@@ -46,7 +55,7 @@ class ArticleRepository {
         page: Int,
         itemsCountInAPage: Int
     ): List<Article> {
-        val filtered1Articles = getSearchKeywordFilteredArticles(articles, boardCode, searchKeyword)
+        val filtered1Articles = getSearchKeywordFilteredArticles(getArticles(), boardCode, searchKeyword)
         val filtered2Articles = getPageFilteredArticles(filtered1Articles, page, itemsCountInAPage)
 
         return filtered2Articles
@@ -57,7 +66,7 @@ class ArticleRepository {
         boardCode: String,
         searchKeyword: String
     ): List<Article> {
-        if (boardCode.isEmpty() && searchKeyword.isNotEmpty()) {
+        if (boardCode.isEmpty() && searchKeyword.isEmpty()) {
             return articles
         }
 
@@ -81,6 +90,7 @@ class ArticleRepository {
                     continue
                 }
             }
+
             filteredArticles.add(article)
         }
 

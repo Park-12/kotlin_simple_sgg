@@ -1,29 +1,10 @@
-import java.io.File
-
 fun main() {
     //testWriteFile();
     //testWriteFile2();
     //testWriteFile3();
     //testReadFile();
     //testReadFile2();
-    testReadFile3()
-}
-
-fun wirteIntFile(filePath: String, fileContent: Int) {
-    writeStrFile(filePath, fileContent.toString())
-}
-
-fun readIntFromFile(filePath: String): Int {
-    return readStrFromFile(filePath).toInt()
-}
-
-fun readStrFromFile(filePath: String): String {
-    return File(filePath).readText(Charsets.UTF_8)
-}
-
-fun writeStrFile(filePath: String, fileContent: String) {
-    File(filePath).parentFile.mkdirs()
-    File(filePath).writeText(fileContent)
+    testReadFile3();
 }
 
 data class TestArticle(
@@ -56,7 +37,7 @@ data class TestArticle(
 }
 
 fun testReadFile3() {
-    wirteIntFile("test/4.txt", 100)
+    writeIntFile("test/4.txt", 100)
     val num = readIntFromFile("test/4.txt")
 
     println("num : $num")
@@ -87,42 +68,6 @@ fun testArticleFromJson(jsonStr: String): TestArticle {
     val body = jsonMap["body"].toString()
 
     return TestArticle(id, title, body)
-}
-
-fun mapFromJson(jsonStr: String): Map<String, Any> {
-    val map = mutableMapOf<String, Any>()
-
-    var jsonStr = jsonStr.drop(1)
-    jsonStr = jsonStr.dropLast(1)
-
-    val jsonItems = jsonStr.split(",\r\n")
-
-    for (jsonItem in jsonItems) {
-        val jsonItemBits = jsonItem.trim().split(":", limit = 2)
-
-        val key = jsonItemBits[0].trim().drop(1).dropLast(1)
-        var value = jsonItemBits[1].trim()
-
-        when {
-            value == "true" -> {
-                map[key] = true
-            }
-            value == "false" -> {
-                map[key] = false
-            }
-            value.startsWith("\"") -> {
-                map[key] = value.drop(1).dropLast(1)
-            }
-            value.contains(".") -> {
-                map[key] = value.toDouble()
-            }
-            else -> {
-                map[key] = value.toInt()
-            }
-        }
-    }
-
-    return map.toMap()
 }
 
 fun testReadFile() {
