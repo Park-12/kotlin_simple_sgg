@@ -5,7 +5,21 @@ class ArticleController {
             return
         }
 
-        print("게시판을 선택(공지사항=1, 자유=2) : ")
+        print("게시판 리스트 : ")
+
+        val boards: List<Board> = boardRepository.getBoards()
+
+        var boardSelectStr = ""
+
+        for ( board in boards ) {
+            if (boardSelectStr.isNotEmpty()) {
+                boardSelectStr += ", "
+            }
+            boardSelectStr += "${board.name} = ${board.id}"
+        }
+        println("${boardSelectStr}")
+
+        print("게시판 선택(번호) : ")
         val boardId = readLineTrim().toInt()
         print("제목 : ")
         val title = readLineTrim()

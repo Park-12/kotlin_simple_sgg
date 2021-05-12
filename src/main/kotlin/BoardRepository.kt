@@ -3,6 +3,10 @@ class BoardRepository {
 
     private var lastId = 0
 
+    fun getBoards(): List<Board> {
+        return boards
+    }
+
     fun makeTestBoards() {
         makeBoard("공지", "notice")
         makeBoard("자유", "free")
