@@ -40,40 +40,48 @@ class ArticleRepository {
         article.updateDate = Util.getNowDateStr()
     }
 
-    fun getFilteredArticles(boardCode:String, searchKeyword: String, page: Int, itemsCountInAPage: Int): List<Article> {
+    fun getFilteredArticles(
+        boardCode: String,
+        searchKeyword: String,
+        page: Int,
+        itemsCountInAPage: Int
+    ): List<Article> {
         val filtered1Articles = getSearchKeywordFilteredArticles(articles, boardCode, searchKeyword)
         val filtered2Articles = getPageFilteredArticles(filtered1Articles, page, itemsCountInAPage)
 
         return filtered2Articles
     }
 
-    private fun getSearchKeywordFilteredArticles(articles: List<Article>, boardCode: String, searchKeyword: String): List<Article> {
+    private fun getSearchKeywordFilteredArticles(
+        articles: List<Article>,
+        boardCode: String,
+        searchKeyword: String
+    ): List<Article> {
+        if (boardCode.isEmpty() && searchKeyword.isNotEmpty()) {
+            return articles
+        }
+
         val filteredArticles = mutableListOf<Article>()
 
-        val boardId = if(boardCode.isEmpty()) {
+        val boardId = if (boardCode.isEmpty()) {
             0
-        }else {
+        } else {
             boardRepository.getBoardByCode(boardCode)!!.id
         }
 
         for (article in articles) {
-            var needToAdd = true
-
-            if ( boardId != 0 ) {
-                if ( article.boardId != boardId ) {
-                    needToAdd = false
+            if (boardId != 0) {
+                if (article.boardId != boardId) {
+                    continue
                 }
             }
 
-            if ( needToAdd && searchKeyword.isNotEmpty() ) {
-                if(!article.title.contains(searchKeyword)) {
-                    needToAdd = false
+            if (searchKeyword.isNotEmpty()) {
+                if (!article.title.contains(searchKeyword)) {
+                    continue
                 }
             }
-
-            if(needToAdd) {
-                filteredArticles.add(article)
-            }
+            filteredArticles.add(article)
         }
 
         return filteredArticles
