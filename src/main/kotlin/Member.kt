@@ -8,4 +8,4 @@ data class Member(
     var nickname: String,
     var cellphoneNo: String,
     var email: String
-)
+) 

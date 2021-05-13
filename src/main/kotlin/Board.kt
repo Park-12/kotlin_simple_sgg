@@ -1,7 +1,7 @@
 data class Board(
     val id: Int,
     val regDate: String,
-    val updateDate: String,
-    val name: String,
-    val code: String
+    var updateDate: String,
+    var name: String,
+    var code: String
 )

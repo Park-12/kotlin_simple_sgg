@@ -11,13 +11,14 @@ class ArticleController {
 
         var boardSelectStr = ""
 
-        for ( board in boards ) {
+        for (board in boards) {
             if (boardSelectStr.isNotEmpty()) {
                 boardSelectStr += ", "
             }
-            boardSelectStr += "${board.name} = ${board.id}"
+            boardSelectStr += "${board.name}=${board.id}"
         }
-        println("${boardSelectStr}")
+
+        println("$boardSelectStr")
 
         print("게시판 선택(번호) : ")
         val boardId = readLineTrim().toInt()

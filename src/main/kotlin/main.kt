@@ -1,8 +1,14 @@
+val memberRepository = MemberRepository()
+val articleRepository = ArticleRepository()
+val boardRepository = BoardRepository()
+
+var loginedMember: Member? = null
+
 fun main() {
     println("== SIMPLE SSG 시작 ==")
 
-    boardRepository.makeTestBoards()
     memberRepository.makeTestMembers()
+    boardRepository.makeTestBoards()
     articleRepository.makeTestArticles()
 
     val systemController = SystemController()
@@ -10,7 +16,7 @@ fun main() {
     val articleController = ArticleController()
     val memberController = MemberController()
 
-    // 1번 회원으로 로그인된 상태로 시작
+    // 1번 회원으로 로그인 된 상태로 시작한다.
     loginedMember = memberRepository.getMemberById(1)
 
     while (true) {
@@ -66,9 +72,3 @@ fun main() {
 
     println("== SIMPLE SSG 끝 ==")
 }
-// 세션 시작
-var loginedMember: Member? = null
-// 세션 끝
-val memberRepository = MemberRepository()
-val articleRepository = ArticleRepository()
-val boardRepository = BoardRepository()

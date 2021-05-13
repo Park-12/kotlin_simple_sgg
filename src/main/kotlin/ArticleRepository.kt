@@ -1,14 +1,31 @@
 class ArticleRepository {
     fun getArticles(): List<Article> {
+        val articles = mutableListOf<Article>()
+
         val lastId = getLastId()
 
         for (id in 1..lastId) {
-            val jsonStr = readStrFromFile("data/article/$id.json")
+            val article = articleFromFile("data/article/$id.json")
 
-            println(jsonStr)
+            articles.add(article)
         }
 
-        return mutableListOf<Article>()
+        return articles
+    }
+
+    fun articleFromFile(jsonFilePath: String): Article {
+        val jsonStr = readStrFromFile(jsonFilePath)
+        val map = mapFromJson(jsonStr)
+
+        val id = map["id"].toString().toInt()
+        val regDate = map["regDate"].toString()
+        var updateDate = map["updateDate"].toString()
+        val boardId = map["boardId"].toString().toInt()
+        val memberId = map["memberId"].toString().toInt()
+        var title = map["title"].toString()
+        var body = map["body"].toString()
+
+        return Article(id, regDate, updateDate, boardId, memberId, title, body)
     }
 
     fun getLastId(): Int {
@@ -18,20 +35,21 @@ class ArticleRepository {
     }
 
     fun deleteArticle(article: Article) {
-        // 파일 삭제
+        // 파일 삭제, 구현
     }
 
     fun getArticleById(id: Int): Article? {
-        // 파일에서 객체 얻기
-        return Article(1, "", "", 1, 1, "", "")
+        // 파일에서 객체 얻기, 구현
+        return null
     }
 
     fun addArticle(boardId: Int, memberId: Int, title: String, body: String): Int {
-        // 파일 생성
+        // 파일 생성, 구현
         return 0
     }
 
     fun makeTestArticles() {
+        // 임시로 막기
         /*
         for (id in 1..20) {
             addArticle(id % 2 + 1, id % 9 + 1, "제목_$id", "내용_$id")
