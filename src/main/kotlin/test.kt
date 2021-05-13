@@ -1,4 +1,7 @@
 fun main() {
+    // 이런식으로 테스트 가능
+    //memberRepository.getMembers()
+
     //testWriteFile();
     //testWriteFile2();
     //testWriteFile3();
@@ -38,7 +41,7 @@ data class TestArticle(
 
 fun testReadFile3() {
     writeIntFile("test/4.txt", 100)
-    val num = readIntFromFile("test/4.txt")
+    val num = readIntFromFile("test/4.txt", 0)
 
     println("num : $num")
 }
