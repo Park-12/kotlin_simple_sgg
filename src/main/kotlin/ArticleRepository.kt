@@ -34,6 +34,10 @@ class ArticleRepository {
         return lastId
     }
 
+    fun setLastId(newLastId: Int) {
+        writeIntFile("data/article/lastId.txt", newLastId)
+    }
+
     fun deleteArticle(article: Article) {
         // 파일 삭제, 구현
     }
@@ -44,17 +48,23 @@ class ArticleRepository {
     }
 
     fun addArticle(boardId: Int, memberId: Int, title: String, body: String): Int {
-        // 파일 생성, 구현
+        val id = getLastId() + 1
+        val regDate = Util.getNowDateStr()
+        val updateDate = Util.getNowDateStr()
+
+        val article = Article(id, regDate, updateDate, boardId, memberId, title, body)
+        val jsonStr = article.toJson()
+        writeStrFile("data/article/${article.id}.json", jsonStr)
+
+        setLastId(id)
+
         return 0
     }
 
     fun makeTestArticles() {
-        // 임시로 막기
-        /*
         for (id in 1..20) {
             addArticle(id % 2 + 1, id % 9 + 1, "제목_$id", "내용_$id")
         }
-        */
     }
 
     fun modifyArticle(id: Int, title: String, body: String) {

@@ -9,7 +9,7 @@ fun main() {
 
     memberRepository.makeTestMembers()
     boardRepository.makeTestBoards()
-    articleRepository.makeTestArticles()
+    //articleRepository.makeTestArticles()
 
     val systemController = SystemController()
     val boardController = BoardController()
