@@ -40,6 +40,10 @@ fun mapFromJson(jsonStr: String): Map<String, Any> {
 }
 
 fun readStrFromFile(filePath: String): String {
+    if ( !File(filePath).isFile ) {
+        return ""
+    }
+
     return File(filePath).readText(Charsets.UTF_8)
 }
 
@@ -54,6 +58,10 @@ fun readIntFromFile(filePath: String): Int {
 
 fun writeIntFile(filePath: String, fileContent: Int) {
     writeStrFile(filePath, fileContent.toString())
+}
+
+fun deleteFile(filePath:String) {
+    File(filePath).delete()
 }
 
 object Util {
