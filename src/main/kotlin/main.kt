@@ -11,7 +11,7 @@ fun main() {
     //memberRepository.getMembers()
     //exitProcess(0)
 
-    memberRepository.makeTestMembers()
+    //memberRepository.makeTestMembers()
     boardRepository.makeTestBoards()
     //articleRepository.makeTestArticles()
 

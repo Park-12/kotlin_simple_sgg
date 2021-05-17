@@ -37,8 +37,7 @@ class MemberController {
 
         if (isJoinableLoginId == false) {
             println("`$loginId`(은)는 이미 사용중인 로그인아이디 입니다.")
-            return
-        }
+            return        }
 
         print("로그인비밀번호 : ")
         val loginPw = readLineTrim()

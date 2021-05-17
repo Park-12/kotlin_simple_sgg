@@ -27,7 +27,7 @@ class ArticleController {
         print("내용 : ")
         val body = readLineTrim()
 
-        val id = articleRepository.addArticle(boardId, loginedMember!!.id, title, body)
+        val id = articleRepository.writeArticle(boardId, loginedMember!!.id, title, body)
 
         println("${id}번 게시물이 추가되었습니다.")
     }
