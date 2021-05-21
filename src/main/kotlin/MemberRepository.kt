@@ -1,6 +1,4 @@
 class MemberRepository {
-    private val members = mutableListOf<Member>()
-
     fun join(
         loginId: String,
         loginPw: String,
@@ -38,12 +36,16 @@ class MemberRepository {
     }
 
     fun getMemberByLoginId(loginId: String): Member? {
-        for (member in members) {
-            if (member.loginId == loginId) {
-                return member
+        val lastId = getLastId()
+
+        for (id in 1..lastId) {
+            val member = memberFromFile("data/member/$id.json")
+
+            if ( member != null ) {
+                if (member.loginId == loginId)
+                    return member
             }
         }
-
         return null
     }
 
