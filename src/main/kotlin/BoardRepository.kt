@@ -4,7 +4,37 @@ class BoardRepository {
     private var lastId = 0
 
     fun getBoards(): List<Board> {
+        val boards = mutableListOf<Board>()
+
+        val lastId = getLastId()
+
+        for (id in 1..lastId) {
+            val board = boardFromFile("data/board/$id.json")
+
+            if ( board != null ) {
+                boards.add(board)
+            }
+        }
+
         return boards
+    }
+
+    private fun boardFromFile(jsonFilePath: String): Board? {
+        val jsonStr = readStrFromFile(jsonFilePath)
+
+        if (jsonStr == "") {
+            return null
+        }
+
+        val map = mapFromJson(jsonStr)
+
+        val id = map["id"].toString().toInt()
+        val regDate = map["regDate"].toString()
+        var updateDate = map["updateDate"].toString()
+        val name = map["name"].toString()
+        val code = map["code"].toString()
+
+        return Board(id, regDate, updateDate, name, code)
     }
 
     fun makeTestBoards() {
