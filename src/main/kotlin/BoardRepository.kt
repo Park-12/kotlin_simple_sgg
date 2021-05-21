@@ -37,13 +37,27 @@ class BoardRepository {
     }
 
     fun makeBoard(name: String, code: String): Int {
-        val id = ++lastId
+        val id = getLastId() + 1
         val regDate = Util.getNowDateStr()
         val updateDate = Util.getNowDateStr()
 
-        boards.add(Board(id, regDate, updateDate, name, code))
+        val board = Board(id, regDate, updateDate, name, code)
+
+        writeStrFile("data/board/${board.id}.json", board.toJson())
+
+        setLastId(id)
 
         return id
+    }
+
+    fun getLastId(): Int {
+        val lastId = readIntFromFile("data/board/lastId.txt", 0)
+
+        return lastId
+    }
+
+    private fun setLastId(newLastId: Int) {
+        writeIntFile("data/board/lastId.txt", newLastId)
     }
 
     fun getBoardById(id: Int): Board? {
