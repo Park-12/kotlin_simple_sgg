@@ -54,13 +54,30 @@ class MemberRepository {
     }
 
     fun getMemberById(id: Int): Member? {
-        for (member in members) {
-            if (member.id == id) {
-                return member
-            }
-        }
+        val member = memberFromFile("data/member/$id.json")
 
-        return null
+        return member
     }
 
-} 
+    private fun memberFromFile(jsonFilePath: String): Member? {
+        val jsonStr = readStrFromFile(jsonFilePath)
+
+        if (jsonStr == "") {
+            return null
+        }
+
+        val map = mapFromJson(jsonStr)
+
+        val id = map["id"].toString().toInt()
+        val regDate = map["regDate"].toString()
+        var updateDate = map["updateDate"].toString()
+        val loginId = map["loginId"].toString()
+        val loginPw = map["loginPw"].toString()
+        var name = map["name"].toString()
+        var nickname = map["nickname"].toString()
+        var cellphoneNo = map["cellphoneNo"].toString()
+        var email = map["email"].toString()
+
+        return Member(id, regDate, updateDate, loginId, loginPw, name, nickname, cellphoneNo, email)
+    }
+}
